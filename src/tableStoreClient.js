@@ -4,10 +4,11 @@ const TableStore = require("tablestore");
 const Long = TableStore.Long;
 const { responseBuilder } = require("./responseBuilder");
 
-const accessKeyId = "LTAIk4xTrr1prgI9";
-const secretAccessKey = "yns8b6FQt7CQhsW5our7b5ieAMpZvi";
-const instanceName = "myTableStore";
-const endpoint = " https://myTableStore.cn-shanghai.ots.aliyuncs.com";
+const accessKeyId = process.env["KEY_ID"];
+const secretAccessKey = process.env["KEY_SECRET"];
+const instanceName = process.env["TABLESTORE_INSTANCE"];
+const endpoint = process.env["TABLESTORE_ENDPOINT"];
+const tableName = process.env["TABLE_NAME"];
 
 // 表格存储对象
 const tablestoreClient = new TableStore.Client({
@@ -107,14 +108,13 @@ exports.createManyAttendanceLogs = async attendanceLogs => {
   const params = {
     tables: [
       {
-        tableName: "AttendanceLog",
+        tableName: tableName,
         rows: rows
       }
     ]
   };
   try {
     const result = await tablestoreClient.batchWriteRow(params);
-    console.log("success result:", result);
   } catch (error) {
     console.error(error);
 
@@ -133,7 +133,6 @@ exports.handleLessonPartEndOrEvaluateEventLog = async (logs, payload) => {
   if (partEndAndEvaluateLogs.length) {
     // TODO
     // 请求服务器生成报告
-    console.log("request generate report");
 
     const axios = Axios.create({
       baseURL: "http://47.101.50.54:7001/",
@@ -145,12 +144,12 @@ exports.handleLessonPartEndOrEvaluateEventLog = async (logs, payload) => {
       return request;
     });
 
-    for (let retryCount = 0; retryCount < 5; retryCount += 1) {
+    for (let retryCount = 0; retryCount < 10; retryCount += 1) {
       // 延迟重发
       await new Promise((resolve, reject) => {
         setTimeout(() => {
           resolve();
-        }, retryCount * 1000);
+        }, retryCount * 500);
       });
 
       try {
@@ -158,7 +157,6 @@ exports.handleLessonPartEndOrEvaluateEventLog = async (logs, payload) => {
           "/enrollment/reportAttendance",
           payload
         );
-        console.log("success result:", result.data);
         return result;
       } catch (error) {
         console.error(`handle End failed. Retrying!`, error);

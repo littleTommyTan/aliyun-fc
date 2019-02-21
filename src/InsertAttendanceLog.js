@@ -7,7 +7,6 @@ const { createMapBy } = require("./createMapBy");
 
 exports.insertAttendanceLog = async (enrollmentId, logs, token) => {
   const logMap = createMapBy(logs, "uuid");
-  console.log(logMap.keys());
 
   const attendanceLogs = [];
   for (const [uuid, logs] of logMap) {
