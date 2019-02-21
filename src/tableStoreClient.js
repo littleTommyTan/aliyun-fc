@@ -158,7 +158,7 @@ exports.handleLessonPartEndOrEvaluateEventLog = async (logs, payload) => {
           "/enrollment/reportAttendance",
           payload
         );
-        console.log("success result:", result);
+        console.log("success result:", result.data);
         return result;
       } catch (error) {
         console.error(`handle End failed. Retrying!`, error);

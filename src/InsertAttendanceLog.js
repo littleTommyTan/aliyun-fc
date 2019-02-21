@@ -1,5 +1,4 @@
 const moment = require("moment");
-const ProgressKey = require("./ProgressKey");
 const {
   createManyAttendanceLogs,
   handleLessonPartEndOrEvaluateEventLog
