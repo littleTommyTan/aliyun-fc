@@ -1,5 +1,4 @@
 const getRawBody = require("raw-body");
-const jwt = require("jsonwebtoken");
 const { insertAttendanceLog } = require("./src/InsertAttendanceLog.js");
 const { responseBuilder } = require("./src/responseBuilder");
 
@@ -7,19 +6,11 @@ module.exports.handler = function(request, response, context) {
   getRawBody(request, async (err, data) => {
     responseBuilder.init(response);
 
-    const userjwt = request.headers.userinfo;
+    const token = request.headers.authorization;
 
-    if (!userjwt) {
+    if (!token) {
       responseBuilder.sendResponse("Not Authorized", 407);
       throw "Not Authorized";
-    }
-
-    const secret = process.env["JWT_SECRET"];
-    const userinfo = jwt.verify(request.headers.userinfo, secret);
-
-    if (!userinfo.token || !userinfo.enrollmentId) {
-      responseBuilder.sendResponse("User Info Error", 408);
-      throw "User Info Error";
     }
 
     let attendanceLogs;
@@ -30,8 +21,7 @@ module.exports.handler = function(request, response, context) {
       throw `Invailed attendancelogs`;
     }
 
-    const enrollmentId = userinfo.enrollmentId;
-    const token = userinfo.token;
+    const enrollmentId = request.queries.id;
 
     if (isNaN(enrollmentId) || !Array.isArray(attendanceLogs)) {
       responseBuilder.sendResponse(
