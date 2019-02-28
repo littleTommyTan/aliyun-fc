@@ -135,7 +135,7 @@ exports.handleLessonPartEndOrEvaluateEventLog = async (logs, payload) => {
     // 请求服务器生成报告
 
     const axios = Axios.create({
-      baseURL: "http://47.101.50.54:7001/",
+      baseURL: process.env["REPORT_URL"],
       timeout: 30000
     });
 
